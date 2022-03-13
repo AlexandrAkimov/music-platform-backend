@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [ConfigModule.forRoot({envFilePath: '.env'}), UserModule, PassportModule, JwtModule.register({
     secret: process.env.jwt_secret,
-    signOptions: { expiresIn: '15s' },
+    signOptions: { expiresIn: '1h' },
   })],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],

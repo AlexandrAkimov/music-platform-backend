@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ObjectId } from 'mongoose';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { TrackService } from './track.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { UpdateTrackDto } from './dto/update-track.dto';
+import { CreateLikeDto } from './dto/create-like.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('tracks')
@@ -36,6 +38,16 @@ export class TrackController {
     return this.trackService.search(query)
   }
 
+  @Put()
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'picture', maxCount: 1 },
+    { name: 'audio', maxCount: 1 },
+  ]))
+  update(@UploadedFiles() files, @Body() dto: UpdateTrackDto) {
+    const {picture, audio} = files
+    return this.trackService.update(dto, picture[0], audio[0])
+  }
+
   @Get(':id')
   getOne(@Param('id') id: ObjectId) {
     return this.trackService.getOne(id)
@@ -54,6 +66,11 @@ export class TrackController {
   @Post('/listen/:id')
   listen(@Param('id') id: ObjectId) {
     return this.trackService.listen(id)
+  }
+
+  @Post('/likes')
+  likes(@Body() dto: CreateLikeDto) {
+    return this.trackService.likes(dto)
   }
   
 }

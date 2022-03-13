@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Comment } from './comments.schema';
+import { Like } from './likes.schema'
 
 import * as mongoose from 'mongoose'
 
@@ -13,6 +14,9 @@ export class Track {
 
   @Prop()
   artist: string;
+
+  @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Like'}]})
+  likes: Like[];
 
   @Prop()
   listens: number;

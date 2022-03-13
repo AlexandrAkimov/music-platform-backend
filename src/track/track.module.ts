@@ -7,11 +7,13 @@ import { Comment, CommentSchema } from './schemas/comments.schema';
 import { FileService } from 'src/file/file.service';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { LikeSchema, Like } from './schemas/likes.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{name: Track.name, schema: TrackSchema}]),
-    MongooseModule.forFeature([{name: Comment.name, schema: CommentSchema}])
+    MongooseModule.forFeature([{name: Comment.name, schema: CommentSchema}]),
+    MongooseModule.forFeature([{name: Like.name, schema: LikeSchema}]),
   ],
   providers: [TrackService, FileService],
   controllers: [TrackController]

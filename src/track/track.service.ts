@@ -6,19 +6,31 @@ import { Comment, CommentDocument } from './schemas/comments.schema';
 import { Track, TrackDocument } from './schemas/track.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { FileService, FileType } from 'src/file/file.service';
+import { UpdateTrackDto } from './dto/update-track.dto';
+import { CreateLikeDto } from './dto/create-like.dto';
+import { Like, LikeDocument } from './schemas/likes.schema';
 
 @Injectable()
 export class TrackService {
   constructor(
     @InjectModel(Track.name) private trackModel: Model<TrackDocument>,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+    @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
     private fileService: FileService
   ) {}
+
   async create(dto: CreateTrackDto, picture, audio): Promise<Track> {
     const audioPath = this.fileService.createFile(FileType.AUDIO, audio);
     const picturePath = this.fileService.createFile(FileType.IMAGE, picture);
     const track = await this.trackModel.create({...dto, listens: 0, audio: audioPath, picture: picturePath})
     return track
+  }
+
+  async update(dto: UpdateTrackDto, picture, audio): Promise<Track> {
+    const audioPath = this.fileService.createFile(FileType.AUDIO, audio);
+    const picturePath = this.fileService.createFile(FileType.IMAGE, picture);
+    await this.trackModel.findByIdAndUpdate(dto.id, { $set: {...dto, audio: audioPath, picture: picturePath}})
+    return await this.trackModel.findById(dto.id)
   }
 
   async getAll(count = 10, offset = 0): Promise<Track[]> {
@@ -48,6 +60,23 @@ export class TrackService {
     const track = await this.trackModel.findById(id)
     track.listens++
     track.save()
+  }
+
+  async likes(dto: CreateLikeDto): Promise<number>{
+    const track = await this.trackModel.findById(dto.trackId)
+    const like = await this.likeModel.findOne({username: dto.username})
+    
+    if (like) {
+      await this.likeModel.findByIdAndDelete(like._id)
+      track.likes = track.likes.filter(l => l === like._id)
+      
+    } else {
+      const newLike = await this.likeModel.create({...dto})
+      track.likes.push(newLike._id)
+    }
+  
+    await track.save()
+    return track.likes.length
   }
 
   async search(query: string): Promise<Track[]> {
