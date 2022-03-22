@@ -12,7 +12,7 @@ import * as path from "path";
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),
     }),
-    MongooseModule.forRoot('mongodb+srv://admin:admin@cluster0.bbypv.mongodb.net/music-platform?retryWrites=true&w=majority'),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     TrackModule,
     FileModule,
     AuthModule,
