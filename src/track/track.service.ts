@@ -33,9 +33,9 @@ export class TrackService {
     return await this.trackModel.findById(dto.id)
   }
 
+  
   async getAll(count = 10, offset = 0): Promise<Track[]> {
-    const tracks = await this.trackModel.find().skip(Number(offset)).limit(Number(count))
-    return tracks
+    return await this.trackModel.find().skip(Number(offset)).limit(Number(count))
   }
 
   async getOne(id: ObjectId): Promise<Track> {
@@ -62,7 +62,7 @@ export class TrackService {
     track.save()
   }
 
-  async likes(dto: CreateLikeDto): Promise<number>{
+  async likes(dto: CreateLikeDto): Promise<Like[]>{
     const track = await this.trackModel.findById(dto.trackId)
     const like = await this.likeModel.findOne({username: dto.username})
     
@@ -76,7 +76,7 @@ export class TrackService {
     }
   
     await track.save()
-    return track.likes.length
+    return track.likes
   }
 
   async search(query: string): Promise<Track[]> {
