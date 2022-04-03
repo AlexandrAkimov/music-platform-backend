@@ -65,15 +65,7 @@ export class TrackService {
   async likes(dto: CreateLikeDto): Promise<Like[]>{
     const track = await this.trackModel.findById(dto.trackId)
     const likes = await this.likeModel.find({username: dto.username})
-    console.log(track.likes);
-    
-    const like = track.likes.find(l => { 
-      return likes.some(li => JSON.stringify(li._id) === JSON.stringify(l))
-    })
-      
-    
-
-    console.log(like);
+    const like = track.likes.find(like => likes.some(l => JSON.stringify(l._id) === JSON.stringify(like)))
     
     if (like) {
       await this.likeModel.findByIdAndDelete(like)
